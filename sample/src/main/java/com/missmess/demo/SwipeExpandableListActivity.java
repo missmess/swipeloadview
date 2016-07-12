@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class SwipeExpandableListActivity extends AppCompatActivity {
     private ArrayList<String> datas;
-    private SwipeLoadViewHelper loadViewHelper;
+    private SwipeLoadViewHelper<ExpandableListView> loadViewHelper;
     private SExpandableAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ExpandableListView expandableListView;
@@ -38,7 +38,7 @@ public class SwipeExpandableListActivity extends AppCompatActivity {
         adapter = new SExpandableAdapter(datas);
         swipeRefreshLayout.setProgressViewOffset(false, 40, 140);
 
-        loadViewHelper = new SwipeLoadViewHelper(swipeRefreshLayout, expandableListView);
+        loadViewHelper = new SwipeLoadViewHelper<>(swipeRefreshLayout, expandableListView);
         loadViewHelper.setAdapter(adapter);
         loadViewHelper.setOnRefreshLoadListener(new SwipeLoadViewHelper.OnRefreshLoadListener() {
             @Override

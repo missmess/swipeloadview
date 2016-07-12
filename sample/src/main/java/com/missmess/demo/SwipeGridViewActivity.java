@@ -16,7 +16,7 @@ import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
 public class SwipeGridViewActivity extends AppCompatActivity {
     private ArrayList<String> datas;
-    private SwipeLoadViewHelper loadViewHelper;
+    private SwipeLoadViewHelper<GridViewWithHeaderAndFooter> loadViewHelper;
     private SListAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private GridViewWithHeaderAndFooter gridView;
@@ -39,8 +39,8 @@ public class SwipeGridViewActivity extends AppCompatActivity {
         adapter = new SListAdapter(datas);
         swipeRefreshLayout.setProgressViewOffset(false, 40, 140);
 
-        loadViewHelper = new SwipeLoadViewHelper(swipeRefreshLayout, gridView);
-        loadViewHelper.setAdapter(adapter, true);
+        loadViewHelper = new SwipeLoadViewHelper<>(swipeRefreshLayout, gridView);
+        loadViewHelper.setAdapter(adapter);
         loadViewHelper.setOnRefreshLoadListener(new SwipeLoadViewHelper.OnRefreshLoadListener() {
             @Override
             public void onRefresh() {

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 public class SwipeRecyclerViewActivity extends AppCompatActivity {
     private ArrayList<String> datas;
-    private SwipeLoadViewHelper loadViewHelper;
+    private SwipeLoadViewHelper<RecyclerView> loadViewHelper;
     private SRecyclerAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
@@ -40,7 +40,7 @@ public class SwipeRecyclerViewActivity extends AppCompatActivity {
         swipeRefreshLayout.setProgressViewOffset(false, 40, 140);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        loadViewHelper = new SwipeLoadViewHelper(swipeRefreshLayout, recyclerView);
+        loadViewHelper = new SwipeLoadViewHelper<>(swipeRefreshLayout, recyclerView);
         loadViewHelper.setAdapter(adapter);
         loadViewHelper.setOnRefreshLoadListener(new SwipeLoadViewHelper.OnRefreshLoadListener() {
             @Override

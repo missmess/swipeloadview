@@ -15,6 +15,7 @@ limitations under the License.
  */
 package com.missmess.swipeloadview;
 
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -24,20 +25,23 @@ import android.view.View.OnClickListener;
  * @author LuckyJayce
  */
 public interface ILoadViewFactory {
-    ILoadMoreView madeLoadMoreView();
     /**
-     * ListView底部加载更多的布局切换
+     * 提供loadmore的布局
+     */
+    ILoadMoreView madeLoadMoreView();
+
+    /**
+     * ListView底部加载更多的布局
      *
      * @author LuckyJayce
      */
     interface ILoadMoreView {
         /**
-         * 初始化
+         * 创建view
          *
-         * @param footViewHolder 添加
          * @param onClickLoadMoreListener 加载更多的点击事件，需要点击调用加载更多的按钮都可以设置这个监听
          */
-        void init(FootViewAdder footViewHolder, OnClickListener onClickLoadMoreListener);
+        View create(LayoutInflater inflater, OnClickListener onClickLoadMoreListener);
         /**
          * 显示普通保布局
          */
@@ -53,13 +57,8 @@ public interface ILoadViewFactory {
         /**
          * 显示加载失败的布局
          *
-         * @param e 错误
+         * @param e 错误信息
          */
         void showFail(Exception e);
-    }
-
-    interface FootViewAdder {
-        View addFootView(View view);
-        View addFootView(int layoutId);
     }
 }

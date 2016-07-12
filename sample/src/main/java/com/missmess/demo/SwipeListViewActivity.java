@@ -6,6 +6,7 @@ import android.os.SystemClock;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.missmess.demo.adapter.SListAdapter;
 import com.missmess.demo.utils.HttpUtils;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 
 public class SwipeListViewActivity extends AppCompatActivity {
     private ArrayList<String> datas;
-    private SwipeLoadViewHelper loadViewHelper;
+    private SwipeLoadViewHelper<ListView> loadViewHelper;
     private SListAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ListView listView;
@@ -34,11 +35,12 @@ public class SwipeListViewActivity extends AppCompatActivity {
     private void init() {
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.srl);
         listView = (ListView) findViewById(R.id.lv);
+
         datas = new ArrayList<>();
         adapter = new SListAdapter(datas);
         swipeRefreshLayout.setProgressViewOffset(false, 40, 140);
 
-        loadViewHelper = new SwipeLoadViewHelper(swipeRefreshLayout, listView);
+        loadViewHelper = new SwipeLoadViewHelper<>(swipeRefreshLayout, listView);
         loadViewHelper.setAdapter(adapter);
         loadViewHelper.setOnRefreshLoadListener(new SwipeLoadViewHelper.OnRefreshLoadListener() {
             @Override
@@ -49,6 +51,19 @@ public class SwipeListViewActivity extends AppCompatActivity {
             @Override
             public void onLoad() {
                 getDatas(false);
+            }
+        });
+        loadViewHelper.setOnListScrollListener(new SwipeLoadViewHelper.OnListScrollListener<ListView>() {
+            boolean showed = false;
+            @Override
+            public void onScroll(ListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if(firstVisibleItem > 10 && !showed) {
+                    Toast.makeText(SwipeListViewActivity.this, "scroll past 10th item", Toast.LENGTH_SHORT).show();
+                    showed = true;
+                }
+                if(firstVisibleItem < 10 && showed) {
+                    showed = false;
+                }
             }
         });
     }

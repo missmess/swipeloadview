@@ -15,7 +15,7 @@ public class CustomLoadFactoryActivity extends AppCompatActivity {
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private ListView listView;
-    private SwipeLoadViewHelper loadViewHelper;
+    private SwipeLoadViewHelper<ListView> loadViewHelper;
     private TextView tv_refresh;
     private TextView tv_loading;
 
@@ -39,7 +39,7 @@ public class CustomLoadFactoryActivity extends AppCompatActivity {
         SCustomAdapter adapter = new SCustomAdapter();
         swipeRefreshLayout.setProgressViewOffset(false, 40, 140);
 
-        loadViewHelper = new SwipeLoadViewHelper(swipeRefreshLayout, listView, new MyLoadFactory());
+        loadViewHelper = new SwipeLoadViewHelper<>(swipeRefreshLayout, listView, new MyLoadFactory());
         loadViewHelper.setAdapter(adapter);
         loadViewHelper.setOnRefreshLoadListener(new SwipeLoadViewHelper.OnRefreshLoadListener() {
             @Override

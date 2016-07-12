@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 
 import com.missmess.swipeloadview.ILoadViewFactory;
+import com.missmess.swipeloadview.ILoadViewHandler;
+import com.missmess.swipeloadview.SwipeLoadViewHelper;
 import com.missmess.swipeloadview.SwipeLoadViewHelper.OnScrollBottomListener;
 
 /**
@@ -17,46 +19,40 @@ import com.missmess.swipeloadview.SwipeLoadViewHelper.OnScrollBottomListener;
  * @author wl
  * @since 2016/4/6 19:13
  */
-public class RecyclerViewHandler {
-	public boolean handleSetAdapter(View contentView, RecyclerView.Adapter adapter, ILoadViewFactory.ILoadMoreView loadMoreView, OnClickListener onClickLoadMoreListener) {
-		final RecyclerView recyclerView = (RecyclerView) contentView;
-		boolean hasInit = false;
+public class RecyclerViewHandler implements ILoadViewHandler<RecyclerView, Adapter> {
+    @Override
+    public boolean handleSetAdapter(RecyclerView refreshView, RecyclerView.Adapter adapter, ILoadViewFactory.ILoadMoreView loadMoreView, OnClickListener onClickLoadMoreListener) {
+        boolean hasInit = false;
 		Adapter<?> adapter2 = (Adapter<?>) adapter;
 		if (loadMoreView != null) {
-			final HFAdapter hfAdapter;
+			HFAdapter hfAdapter;
 			if (adapter instanceof HFAdapter) {
 				hfAdapter = (HFAdapter) adapter;
 			} else {
 				hfAdapter = new HFRecyclerAdapter(adapter2);
 			}
 			adapter2 = hfAdapter;
-			final Context context = recyclerView.getContext().getApplicationContext();
-			loadMoreView.init(new ILoadViewFactory.FootViewAdder() {
+			Context context = refreshView.getContext().getApplicationContext();
+            View footView = loadMoreView.create(LayoutInflater.from(context), onClickLoadMoreListener);
+            hfAdapter.addFooter(footView);
 
-				@Override
-				public View addFootView(int layoutId) {
-					View view = LayoutInflater.from(context).inflate(layoutId, recyclerView, false);
-					return addFootView(view);
-				}
-
-				@Override
-				public View addFootView(View view) {
-					hfAdapter.addFooter(view);
-					return view;
-				}
-			}, onClickLoadMoreListener);
 			hasInit = true;
 		}
-		recyclerView.setAdapter(adapter2);
+		refreshView.setAdapter(adapter2);
 		return hasInit;
 	}
 
-	public void setOnScrollBottomListener(View contentView, OnScrollBottomListener onScrollBottomListener) {
-		final RecyclerView recyclerView = (RecyclerView) contentView;
-		recyclerView.addOnScrollListener(new RecyclerViewOnScrollListener(onScrollBottomListener));
+    @Override
+    public void setUpListener(RecyclerView refreshView, OnScrollBottomListener onScrollBottomListener) {
+        refreshView.addOnScrollListener(new RecyclerViewOnScrollListener(onScrollBottomListener));
 	}
 
-	/**
+    @Override
+    public void setOnScrollListener(SwipeLoadViewHelper.OnListScrollListener<RecyclerView> scrollListener) {
+
+    }
+
+    /**
 	 * 滑动监听
 	 */
 	private static class RecyclerViewOnScrollListener extends RecyclerView.OnScrollListener {
@@ -93,5 +89,5 @@ public class RecyclerViewHandler {
 
 		}
 
-	};
+	}
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
+              xmlns:miss="http://schemas.android.com/apk/res-auto"
               android:layout_height="wrap_content"
               android:layout_gravity="center">
 
@@ -11,12 +12,14 @@
         android:gravity="center"
         android:padding="10dp">
 
-        <ProgressBar
-            style="?android:progressBarStyleInverse"
+        <com.missmess.swipeloadview.ProgressWheel
             android:id="@+id/progress_wheel"
             android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_marginRight="16dp"
-            android:layout_height="25dp"/>
+            miss:matProg_barColor="#C8C8C8"
+            miss:matProg_barWidth="2dp"
+            miss:matProg_progressIndeterminate="true" />
 
         <TextView
             android:id="@+id/pull_to_load_footer_hint_textview"

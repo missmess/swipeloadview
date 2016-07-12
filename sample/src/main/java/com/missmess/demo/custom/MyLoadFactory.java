@@ -1,5 +1,6 @@
 package com.missmess.demo.custom;
 
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RadioButton;
 
@@ -24,12 +25,14 @@ public class MyLoadFactory implements ILoadViewFactory {
         private RadioButton error;
 
         @Override
-        public void init(FootViewAdder footViewHolder, View.OnClickListener onClickLoadMoreListener) {
-            View view = footViewHolder.addFootView(R.layout.view_custom_load);
+        public View create(LayoutInflater inflater, View.OnClickListener onClickLoadMoreListener) {
+            View view = inflater.inflate(R.layout.view_custom_load, null);
             normal = (RadioButton) view.findViewById(R.id.radioButton1);
             loading = (RadioButton) view.findViewById(R.id.radioButton2);
             nodata = (RadioButton) view.findViewById(R.id.radioButton3);
             error = (RadioButton) view.findViewById(R.id.radioButton4);
+
+            return view;
         }
 
         @Override

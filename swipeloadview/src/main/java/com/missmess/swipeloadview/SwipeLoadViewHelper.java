@@ -3,15 +3,15 @@ package com.missmess.swipeloadview;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.AbsListView;
-import android.widget.ExpandableListAdapter;
-import android.widget.GridView;
-import android.widget.ListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ListView;
 
 import com.missmess.swipeloadview.gridview.GridViewHandler;
+import com.missmess.swipeloadview.listview.ExpandableListViewHandler;
 import com.missmess.swipeloadview.listview.ListViewHandler;
 import com.missmess.swipeloadview.recyclerview.RecyclerViewHandler;
+
+import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
 /**
  * 在SwipeRefreshLayout中使用listview，RecyclerView，GridView等，并让这些view支持上拉加载更多的helper类。
@@ -19,17 +19,16 @@ import com.missmess.swipeloadview.recyclerview.RecyclerViewHandler;
  * @author wl
  * @since 2015/12/02 09:57
  */
-public class SwipeLoadViewHelper {
+public class SwipeLoadViewHelper<V extends View> {
     private static final int SWIPE_ANIM_DELAY = 500;
     private SwipeRefreshLayout mRefreshLayout;
-    private View mRefreshView;
+    private V mRefreshView;
     private ILoadViewFactory.ILoadMoreView mLoadMoreView;
-    private ListViewHandler listViewHandler;
-    private RecyclerViewHandler recyclerViewHandler;
-    private GridViewHandler gridViewHandler;
-    private boolean hasInitLoadMoreView;
+    private ILoadViewHandler loadHandler;
     private OnRefreshLoadListener onRefreshLoadListener;
     private OnScrollBottomListener onScrollBottomListener;
+    private View.OnClickListener onLoadMoreBtnClickListener;
+    private boolean hasInitLoadMoreView = false;
     private boolean mHasMore = true;
     private boolean hasError = false;
     private boolean isLoading = false;
@@ -39,9 +38,9 @@ public class SwipeLoadViewHelper {
      * 构造一个支持SwipeRefreshLayout+下拉加载的helper，使用默认 {@link DefaultLoadViewFactory} 显示加载更多，加载失败等界面。
      *
      * @param refreshLayout SwipeRefreshLayout
-     * @param mRefreshView  需要支持下拉刷新，上拉加载的view。ListView、RecyclerView、GridView、ExpandableListView中的一个
+     * @param mRefreshView  需要支持下拉刷新，上拉加载的view。ListView、RecyclerView、{@link GridViewWithHeaderAndFooter}、ExpandableListView中的一个
      */
-    public SwipeLoadViewHelper(SwipeRefreshLayout refreshLayout, View mRefreshView) {
+    public SwipeLoadViewHelper(SwipeRefreshLayout refreshLayout, V mRefreshView) {
         this(refreshLayout, mRefreshView, new DefaultLoadViewFactory());
     }
 
@@ -49,20 +48,24 @@ public class SwipeLoadViewHelper {
      * 构造一个支持SwipeRefreshLayout+下拉加载的helper
      *
      * @param refreshLayout   SwipeRefreshLayout
-     * @param mRefreshView    需要支持下拉刷新，上拉加载的view。ListView、RecyclerView、GridView、ExpandableListView中的一个
+     * @param mRefreshView    需要支持下拉刷新，上拉加载的view。ListView、RecyclerView、{@link GridViewWithHeaderAndFooter}、ExpandableListView中的一个
      * @param loadViewFactory 布局factory
      */
-    public SwipeLoadViewHelper(SwipeRefreshLayout refreshLayout, View mRefreshView, ILoadViewFactory loadViewFactory) {
+    public SwipeLoadViewHelper(SwipeRefreshLayout refreshLayout, V mRefreshView, ILoadViewFactory loadViewFactory) {
         this.mRefreshLayout = refreshLayout;
         this.mRefreshView = mRefreshView;
         this.mLoadMoreView = loadViewFactory.madeLoadMoreView();
 
-        if (mRefreshView instanceof ListView) {
-            listViewHandler = new ListViewHandler();
+        if (mRefreshView instanceof ExpandableListView) {
+            loadHandler = new ExpandableListViewHandler();
+        } else if (mRefreshView instanceof ListView) {
+            loadHandler = new ListViewHandler();
         } else if (mRefreshView instanceof RecyclerView) {
-            recyclerViewHandler = new RecyclerViewHandler();
-        } else if (mRefreshView instanceof GridView) {
-            gridViewHandler = new GridViewHandler();
+            loadHandler = new RecyclerViewHandler();
+        } else if (mRefreshView instanceof GridViewWithHeaderAndFooter) {
+            loadHandler = new GridViewHandler();
+        } else {
+            throw new IllegalArgumentException("this view do not support Load-More function");
         }
 
         onScrollBottomListener = new OnScrollBottomListener() {
@@ -71,6 +74,12 @@ public class SwipeLoadViewHelper {
                 if (!hasError) {
                     judgeToLoadMore();
                 }
+            }
+        };
+        onLoadMoreBtnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                judgeToLoadMore();
             }
         };
 
@@ -105,61 +114,13 @@ public class SwipeLoadViewHelper {
     }
 
     /**
-     * 设置ListView或GridView的适配器
+     * 设置适配器。需要与设置的refreshView匹配。
      *
      * @param adapter 适配器
      */
-    public void setAdapter(ListAdapter adapter) {
-        hasInitLoadMoreView = false;
-        if (listViewHandler != null) {
-            hasInitLoadMoreView = listViewHandler.handleSetAdapter(mRefreshView, adapter, mLoadMoreView, new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    judgeToLoadMore();
-                }
-            });
-            listViewHandler.setOnScrollBottomListener(mRefreshView, onScrollBottomListener);
-        } else {
-            hasInitLoadMoreView = gridViewHandler.handleSetAdapter(mRefreshView, adapter, mLoadMoreView, new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    judgeToLoadMore();
-                }
-            });
-            gridViewHandler.setOnScrollBottomListener(mRefreshView, onScrollBottomListener);
-        }
-    }
-
-    /**
-     * 设置ExpandableListView的适配器
-     *
-     * @param adapter 适配器
-     */
-    public void setAdapter(ExpandableListAdapter adapter) {
-        hasInitLoadMoreView = false;
-        hasInitLoadMoreView = listViewHandler.handleSetAdapter(mRefreshView, adapter, mLoadMoreView, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                judgeToLoadMore();
-            }
-        });
-        listViewHandler.setOnScrollBottomListener(mRefreshView, onScrollBottomListener);
-    }
-
-    /**
-     * 设置RecyclerView的适配器
-     *
-     * @param adapter 适配器
-     */
-    public void setAdapter(RecyclerView.Adapter adapter) {
-        hasInitLoadMoreView = false;
-        hasInitLoadMoreView = recyclerViewHandler.handleSetAdapter(mRefreshView, adapter, mLoadMoreView, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                judgeToLoadMore();
-            }
-        });
-        recyclerViewHandler.setOnScrollBottomListener(mRefreshView, onScrollBottomListener);
+    public void setAdapter(Object adapter) {
+        loadHandler.setUpListener(mRefreshView, onScrollBottomListener);
+        hasInitLoadMoreView = loadHandler.handleSetAdapter(mRefreshView, adapter, mLoadMoreView, onLoadMoreBtnClickListener);
     }
 
     /**
@@ -259,18 +220,18 @@ public class SwipeLoadViewHelper {
         void onLoad();
     }
 
-    public void setOnListScrollListener(OnListScrollListener scrollListener) {
-        listViewHandler.setOnScrollListener(scrollListener);
+    public void setOnListScrollListener(OnListScrollListener<V> scrollListener) {
+        loadHandler.setOnScrollListener(scrollListener);
     }
 
-    public static abstract class OnListScrollListener {
+    public static abstract class OnListScrollListener<G> {
         public OnListScrollListener() {
         }
 
-        public void onScrollStateChanged(AbsListView listView, int scrollState) {
+        public void onScrollStateChanged(G view, int scrollState) {
         }
 
-        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        public void onScroll(G view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         }
     }
 
