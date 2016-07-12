@@ -23,6 +23,7 @@ public class CustomLoadFactoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_load_factory);
+        getSupportActionBar().setTitle("Custom LoadView");
 
         init();
     }

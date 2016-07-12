@@ -17,8 +17,10 @@ public class MyLoadFactory implements ILoadViewFactory {
         return new MyLoadMoreView();
     }
 
+    /**
+     * custom load more view
+     */
     class MyLoadMoreView implements ILoadMoreView {
-
         private RadioButton normal;
         private RadioButton loading;
         private RadioButton nodata;
@@ -52,6 +54,7 @@ public class MyLoadFactory implements ILoadViewFactory {
 
         @Override
         public void showFail(Exception e) {
+            // 错误信息通过e.getMessage()来获取
             error.setText(e.getMessage());
             error.setChecked(true);
         }
