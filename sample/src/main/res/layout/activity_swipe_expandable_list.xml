@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.SwipeRefreshLayout
+    android:id="@+id/srl"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ECECEC"
+    tools:context="com.missmess.demo.SwipeListViewActivity">
+
+    <ExpandableListView
+        android:id="@+id/elv"
+        android:layout_width="match_parent"
+        android:divider="#ECECEC"
+        android:dividerHeight="1dp"
+        android:footerDividersEnabled="false"
+        android:layout_height="match_parent"/>
+
+</android.support.v4.widget.SwipeRefreshLayout>
