@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.missmess.demo.adapter.SListAdapter;
 import com.missmess.demo.utils.HttpUtils;
-import com.missmess.swipeloadview.SwipeLoadViewHelper;
+import com.missmess.swipeloadview.LoadMoreHelper;
 
 import java.util.ArrayList;
 
@@ -16,7 +16,7 @@ import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
 public class SwipeGridViewActivity extends AppCompatActivity {
     private ArrayList<String> datas;
-    private SwipeLoadViewHelper<GridViewWithHeaderAndFooter> loadViewHelper;
+    private LoadMoreHelper loadViewHelper;
     private SListAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private GridViewWithHeaderAndFooter gridView;
@@ -29,7 +29,7 @@ public class SwipeGridViewActivity extends AppCompatActivity {
 
         init();
         getDatas(true);
-        loadViewHelper.animRefresh();
+        loadViewHelper.setRefresh();
     }
 
     private void init() {
@@ -39,9 +39,9 @@ public class SwipeGridViewActivity extends AppCompatActivity {
         adapter = new SListAdapter(datas);
         swipeRefreshLayout.setProgressViewOffset(false, 40, 140);
 
-        loadViewHelper = new SwipeLoadViewHelper<>(swipeRefreshLayout, gridView);
+        loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, gridView);
         loadViewHelper.setAdapter(adapter);
-        loadViewHelper.setOnRefreshLoadListener(new SwipeLoadViewHelper.OnRefreshLoadListener() {
+        loadViewHelper.setOnRefreshLoadListener(new LoadMoreHelper.OnRefreshLoadListener() {
             @Override
             public void onRefresh() {
                 getDatas(true);
@@ -94,10 +94,10 @@ public class SwipeGridViewActivity extends AppCompatActivity {
 
             private void onFinish() {
                 loadViewHelper.completeRefresh();
-                loadViewHelper.completeLoadmore();
+                loadViewHelper.completeLoadMore();
             }
         };
-        asyncTask.execute("http://www.baidu.com");
+        asyncTask.execute("https://www.baidu.com");
     }
 
     private void refreshData() {

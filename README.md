@@ -1,8 +1,7 @@
-#SwipeLoadView
-  
-  SwipeLoadView可以在使用SwipeRefreshLayout作为下拉刷新控件时，同时为list增加加载更多功能。
-  
-  SwipeLoadView is a helper library when using SwipeRefreshLayout to pull refresh, use this to add pull to load more function.
+# LoadMoreHelper
+  <b>原SwipeLoadView已经改名为LoadMoreHelper，支持更多刷新控件。</b>
+  LoadMoreHelper可以为任意下拉刷新控件，多种滚动布局(RecyclerView, ListView, GridView, ExpandableListView等)
+  增加上拉加载功能，可以作为下拉刷新库的加载功能补充。
   
 ---
 
@@ -15,33 +14,34 @@
 
 ---
 
-###主要功能介绍
+### 主要功能介绍
 
-* 可以同时支持为ListView、RecyclerView、GridView、ExpandableListView增加pull load功能。
-* load more包含上拉加载、加载中、加载失败、没有更多的功能。
-* 支持完全自定义load more的布局。
-* pull refresh和pull load不会同时进行导致冲突。
+* 可以同时支持为ListView、RecyclerView、GridView、ExpandableListView等内容组件增加pull load功能。
+* load more包含上拉加载、加载中、加载失败、没有更多的功能。可以实现完全自定义。
+* 支持添加各种下拉刷新组件的关联，关联后可以解决refresh和load状态的一些处理和冲突等。
+* 默认实现了一套完整的功能，包含SwipeRefreshLayout+(ListView, RecyclerView, GridView, ExpandableListView)+DefaultLoadMoreView。
+* 其它想要自定义的话，实现IRefreshLayoutHandler或ILoadViewHandler或ILoadMoreView（看你自己想自定义那些部分），并在构造LoadMoreHelper时传入即可。
 
 ---
 
-###如何添加到项目中
+### 如何添加到项目中
 
 本library已经支持maven。Android Studio用户，只需要在项目的build.gradle中添加该depandencies：
 
   `
-    compile "com.missmess.swipeloadview:swipeloadview:1.0.0"
+    compile 'com.missmess.swipeloadview:loadmorehelper:2.1.0'
   `
 
 ---
 
-###如何使用
+### 如何使用
 
 调用非常简单，只需要几句代码即可实现为你的refresh view添加加载更多的功能。
 
   用法如下：
 ```java
-// new a SwipeLoadViewHelper
-SwipeLoadViewHelper<ListView> loadViewHelper = new SwipeLoadViewHelper<>(swipeRefreshLayout, listView);
+// new a LoadMoreHelper
+LoadMoreHelper loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, listView);
 // set adapter
 loadViewHelper.setAdapter(adapter);
 // set refresh and load listener
@@ -66,70 +66,67 @@ loadViewHelper.setOnRefreshLoadListener(new SwipeLoadViewHelper.OnRefreshLoadLis
 ```
 ---
 
-###示例代码
-######1、为不同的refresh view添加pull load支持
+### 示例代码
+###### 0、默认增加对SwipeRefreshLayout刷新库的支持
+```java
+LoadMoreHelper loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, listView);
+```
 
-SwipeLoadView可以为ListView、RecyclerView、GridView、ExpandableListView添加支持。仅需要为这些不同的refresh view添加对应的泛型，和adapter即可。
+如果需要自己指定特定的刷新库，可以实现对应的IRefreshLayoutHandler。并在构造LoadMoreHelper时，传入。以
+SmartRefreshLayout为例：
+```java
+LoadMoreHelper loadViewHelper = new LoadMoreHelper(smartRefreshLayout, new IRefreshLayoutHandler<SmartRefreshLayout>() {
+		@Override
+		public void handleSetRefreshListener(SmartRefreshLayout view, final Runnable runnable) {
+			view.setOnRefreshListener(new OnRefreshListener() {
+				@Override
+				public void onRefresh(RefreshLayout refreshLayout) {
+					runnable.run();
+				}
+			});
+		}
+		@Override
+		public void refresh(SmartRefreshLayout view) {
+			view.autoRefresh();
+		}
+		@Override
+		public void finishRefresh(SmartRefreshLayout view) {
+			view.finishRefresh();
+		}
+	}, recyclerView);
+```
+
+###### 1、为不同的refresh view添加pull load支持
+
+可以为ListView、RecyclerView、GridView、ExpandableListView添加支持。仅需要为这些不同的refresh view添加对应的泛型，和adapter即可。
 
 * ListView
 ```java
-SwipeLoadViewHelper<ListView> loadViewHelper = new SwipeLoadViewHelper<>(swipeRefreshLayout, listView);
+LoadMoreHelper loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, listView);
 loadViewHelper.setAdapter(new MyListAdapter());
 ```
 
 * RecyclerView
 ```java
-SwipeLoadViewHelper<RecyclerView> loadViewHelper = new SwipeLoadViewHelper<>(swipeRefreshLayout, recyclerView);
+LoadMoreHelper loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, recyclerView);
 loadViewHelper.setAdapter(new MyRecyclerAdapter());
-```
-使用RecyclerView时，adapter需要继承于HFAdapter：
-```java
-public class MyListAdapter extends HFAdapter {
-    private List<String> datas;
-
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolderHF(ViewGroup viewGroup, int type) {
-        View view = View.inflate(viewGroup.getContext(), R.layout.item_text, null);
-        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        return new ViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolderHF(RecyclerView.ViewHolder vh, int position) {
-        ViewHolder holder = (ViewHolder) vh;
-        holder.tv.setText(String.format("%s %d", datas.get(position), position));
-    }
-
-    @Override
-    public int getItemCountHF() {
-        return datas.size();
-    }
-
-    static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tv;
-        public ViewHolder(View itemView) {
-            super(itemView);
-            tv = (TextView) itemView;
-        }
-    }
-}
 ```
 
 * GridView
 
     需要使用`GridViewWithHeaderAndFooter`替代GridView。
 ```java
-SwipeLoadViewHelper<GridViewWithHeaderAndFooter> loadViewHelper = new SwipeLoadViewHelper<>(swipeRefreshLayout, gridView);
+LoadMoreHelper loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, gridView);
 loadViewHelper.setAdapter(new MyGridAdapter());
 ```
 
 * ExpandableListView
 ```java
-SwipeLoadViewHelper<ExpandableListView> loadViewHelper = new SwipeLoadViewHelper<>(swipeRefreshLayout, expandableListView);
+LoadMoreHelper loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, expandableListView);
 loadViewHelper.setAdapter(new MyExpandListAdapter());
 ```
 
-######2、通知SwipeLoadViewHelper，没有更多数据了
+###### 2、通知SwipeLoadViewHelper，没有更多数据了
 
   没有更多数据时，需要调用setHasMoreData方法告知SwipeLoadViewHelper。
 ```java
@@ -138,14 +135,14 @@ if (nomoredata) { //没有更多数据了
 }
 ```
 
-######3、设置自定义加载失败信息
+###### 3、设置自定义加载失败信息
 
   加载失败时，可以自定义显示错误信息
 ```java
 loadViewHelper.setLoadMoreError("connect failed, click to retry");
 ```
 
-######4、自定义loadview
+###### 4、自定义loadview
 
   可以完全自定义LoadView的布局，通过实现ILoadViewFactory：
 ```java
@@ -191,9 +188,9 @@ public class MyLoadFactory implements ILoadViewFactory {
         }
 
         @Override
-        public void showFail(Exception e) {
+        public void showFail(CharSequence e) {
             // 错误信息通过e.getMessage()来获取
-            error.setText(e.getMessage());
+            error.setText(e);
             error.setChecked(true);
         }
     }
@@ -201,12 +198,12 @@ public class MyLoadFactory implements ILoadViewFactory {
 ```
 并在new SwipeLoadViewHelper时，传参：
 ```java
-    SwipeLoadViewHelper<ListView> loadViewHelper = new SwipeLoadViewHelper<>(swipeRefreshLayout, listView, new MyLoadFactory());
+    LoadMoreHelper loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, listView, new MyLoadFactory());
 ```
 
 ---
 
-###截图
+### 截图
 ![image](https://raw.githubusercontent.com/missmess/swipeloadview/master/raw/picc1.jpg)
 ![image](https://raw.githubusercontent.com/missmess/swipeloadview/master/raw/picc2.jpg)
 ![image](https://raw.githubusercontent.com/missmess/swipeloadview/master/raw/picc3.jpg)
@@ -215,7 +212,7 @@ public class MyLoadFactory implements ILoadViewFactory {
 
 ---
 
-###关于作者
+### 关于作者
 在使用中有任何问题，欢迎反馈给我，可以用以下联系方式跟我交流：
 
 * QQ: 478271233
@@ -223,4 +220,4 @@ public class MyLoadFactory implements ILoadViewFactory {
 * GitHub: [@missmess](https://github.com/missmess)
 
 ---
-######CopyRight：`missmess`
+###### CopyRight：`missmess`

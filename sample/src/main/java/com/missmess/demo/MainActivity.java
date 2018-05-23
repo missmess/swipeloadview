@@ -30,6 +30,12 @@ public class MainActivity extends AppCompatActivity {
             case R.id.button5:
                 startActivity(new Intent(this, CustomLoadFactoryActivity.class));
                 break;
+            case R.id.button6:
+                startActivity(new Intent(this, NoneRecyclerViewActivity.class));
+                break;
+            case R.id.button7:
+                startActivity(new Intent(this, SmartRefreshRecyclerViewActivity.class));
+                break;
         }
     }
 }

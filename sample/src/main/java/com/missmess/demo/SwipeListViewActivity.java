@@ -5,18 +5,20 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.missmess.demo.adapter.SListAdapter;
 import com.missmess.demo.utils.HttpUtils;
-import com.missmess.swipeloadview.SwipeLoadViewHelper;
+import com.missmess.swipeloadview.LoadMoreHelper;
+import com.missmess.swipeloadview.listview.ListViewHandler;
 
 import java.util.ArrayList;
 
 public class SwipeListViewActivity extends AppCompatActivity {
     private ArrayList<String> datas;
-    private SwipeLoadViewHelper<ListView> loadViewHelper;
+    private LoadMoreHelper loadViewHelper;
     private SListAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ListView listView;
@@ -29,7 +31,7 @@ public class SwipeListViewActivity extends AppCompatActivity {
 
         init();
         getDatas(true);
-        loadViewHelper.animRefresh();
+        loadViewHelper.setRefresh();
     }
 
     private void init() {
@@ -40,9 +42,9 @@ public class SwipeListViewActivity extends AppCompatActivity {
         adapter = new SListAdapter(datas);
         swipeRefreshLayout.setProgressViewOffset(false, 40, 140);
 
-        loadViewHelper = new SwipeLoadViewHelper<>(swipeRefreshLayout, listView);
+        loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, listView);
         loadViewHelper.setAdapter(adapter);
-        loadViewHelper.setOnRefreshLoadListener(new SwipeLoadViewHelper.OnRefreshLoadListener() {
+        loadViewHelper.setOnRefreshLoadListener(new LoadMoreHelper.OnRefreshLoadListener() {
             @Override
             public void onRefresh() {
                 getDatas(true);
@@ -53,10 +55,17 @@ public class SwipeListViewActivity extends AppCompatActivity {
                 getDatas(false);
             }
         });
-        loadViewHelper.setOnListScrollListener(new SwipeLoadViewHelper.OnListScrollListener<ListView>() {
+        ListViewHandler loadHandler = (ListViewHandler) loadViewHelper.getLoadHandler();
+        loadHandler.setOnScrollListener(new AbsListView.OnScrollListener() {
             boolean showed = false;
+
             @Override
-            public void onScroll(ListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if(firstVisibleItem > 10 && !showed) {
                     Toast.makeText(SwipeListViewActivity.this, "scroll past 10th item", Toast.LENGTH_SHORT).show();
                     showed = true;
@@ -108,10 +117,10 @@ public class SwipeListViewActivity extends AppCompatActivity {
 
             private void onFinish() {
                 loadViewHelper.completeRefresh();
-                loadViewHelper.completeLoadmore();
+                loadViewHelper.completeLoadMore();
             }
         };
-        asyncTask.execute("http://www.baidu.com");
+        asyncTask.execute("https://www.baidu.com");
     }
 
     private void refreshData() {

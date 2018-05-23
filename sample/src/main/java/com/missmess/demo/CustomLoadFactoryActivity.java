@@ -8,14 +8,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.missmess.demo.adapter.SCustomAdapter;
-import com.missmess.demo.custom.MyLoadFactory;
-import com.missmess.swipeloadview.SwipeLoadViewHelper;
+import com.missmess.demo.custom.MyLoadMoreView;
+import com.missmess.swipeloadview.LoadMoreHelper;
 
 public class CustomLoadFactoryActivity extends AppCompatActivity {
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private ListView listView;
-    private SwipeLoadViewHelper<ListView> loadViewHelper;
+    private LoadMoreHelper loadViewHelper;
     private TextView tv_refresh;
     private TextView tv_loading;
 
@@ -40,9 +40,9 @@ public class CustomLoadFactoryActivity extends AppCompatActivity {
         SCustomAdapter adapter = new SCustomAdapter();
         swipeRefreshLayout.setProgressViewOffset(false, 40, 140);
 
-        loadViewHelper = new SwipeLoadViewHelper<>(swipeRefreshLayout, listView, new MyLoadFactory());
+        loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, listView, new MyLoadMoreView());
         loadViewHelper.setAdapter(adapter);
-        loadViewHelper.setOnRefreshLoadListener(new SwipeLoadViewHelper.OnRefreshLoadListener() {
+        loadViewHelper.setOnRefreshLoadListener(new LoadMoreHelper.OnRefreshLoadListener() {
             @Override
             public void onRefresh() {
                 tv_refresh.setText(loadViewHelper.isRefreshing() ?"true" : "false");
@@ -61,7 +61,7 @@ public class CustomLoadFactoryActivity extends AppCompatActivity {
                 listView.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        loadViewHelper.completeLoadmore();
+                        loadViewHelper.completeLoadMore();
                         tv_loading.setText(loadViewHelper.isLoading() ?"true" : "false");
                     }
                 }, 1000);
@@ -72,13 +72,13 @@ public class CustomLoadFactoryActivity extends AppCompatActivity {
     public void onBtnClick(View view) {
         switch (view.getId()) {
             case R.id.button1:
-                loadViewHelper.animRefresh();
+                loadViewHelper.setRefresh();
                 break;
             case R.id.button2:
-                loadViewHelper.endAnimRefresh();
+                loadViewHelper.completeRefresh();
                 break;
             case R.id.button3:
-                loadViewHelper.setLoadMoreError("show your custom error info");
+                loadViewHelper.setLoadMoreError("show custom error information");
                 break;
         }
     }

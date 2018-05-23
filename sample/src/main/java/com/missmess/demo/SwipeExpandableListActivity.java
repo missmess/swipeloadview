@@ -9,13 +9,13 @@ import android.widget.ExpandableListView;
 
 import com.missmess.demo.adapter.SExpandableAdapter;
 import com.missmess.demo.utils.HttpUtils;
-import com.missmess.swipeloadview.SwipeLoadViewHelper;
+import com.missmess.swipeloadview.LoadMoreHelper;
 
 import java.util.ArrayList;
 
 public class SwipeExpandableListActivity extends AppCompatActivity {
     private ArrayList<String> datas;
-    private SwipeLoadViewHelper<ExpandableListView> loadViewHelper;
+    private LoadMoreHelper loadViewHelper;
     private SExpandableAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ExpandableListView expandableListView;
@@ -28,7 +28,7 @@ public class SwipeExpandableListActivity extends AppCompatActivity {
 
         init();
         getDatas(true);
-        loadViewHelper.animRefresh();
+        loadViewHelper.setRefresh();
     }
 
     private void init() {
@@ -38,9 +38,9 @@ public class SwipeExpandableListActivity extends AppCompatActivity {
         adapter = new SExpandableAdapter(datas);
         swipeRefreshLayout.setProgressViewOffset(false, 40, 140);
 
-        loadViewHelper = new SwipeLoadViewHelper<>(swipeRefreshLayout, expandableListView);
+        loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, expandableListView);
         loadViewHelper.setAdapter(adapter);
-        loadViewHelper.setOnRefreshLoadListener(new SwipeLoadViewHelper.OnRefreshLoadListener() {
+        loadViewHelper.setOnRefreshLoadListener(new LoadMoreHelper.OnRefreshLoadListener() {
             @Override
             public void onRefresh() {
                 getDatas(true);
@@ -93,10 +93,10 @@ public class SwipeExpandableListActivity extends AppCompatActivity {
 
             private void onFinish() {
                 loadViewHelper.completeRefresh();
-                loadViewHelper.completeLoadmore();
+                loadViewHelper.completeLoadMore();
             }
         };
-        asyncTask.execute("http://www.baidu.com");
+        asyncTask.execute("https://www.baidu.com");
     }
 
     private void refreshData() {

@@ -23,29 +23,33 @@
             android:id="@+id/radioButton1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:clickable="false"
             android:checked="true"
-            android:text="pull up to load more"/>
+            android:text="normal state"/>
 
         <RadioButton
             android:id="@+id/radioButton2"
             android:layout_width="wrap_content"
+            android:clickable="false"
             android:layout_height="wrap_content"
             android:checked="false"
-            android:text="loading more"/>
+            android:text="is loading"/>
 
         <RadioButton
             android:id="@+id/radioButton3"
+            android:clickable="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="false"
-            android:text="no more data"/>
+            android:text="have no more data"/>
 
         <RadioButton
             android:id="@+id/radioButton4"
             android:layout_width="wrap_content"
+            android:clickable="false"
             android:layout_height="wrap_content"
             android:checked="false"
-            android:text="error tips"/>
+            android:text="error state"/>
 
     </RadioGroup>
 </LinearLayout>

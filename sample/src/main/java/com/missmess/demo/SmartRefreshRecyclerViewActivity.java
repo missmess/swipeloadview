@@ -3,44 +3,47 @@ package com.missmess.demo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.missmess.demo.adapter.SRecyclerAdapter;
+import com.missmess.demo.smart.SmartRefreshLayoutHandler;
 import com.missmess.demo.utils.HttpUtils;
 import com.missmess.swipeloadview.LoadMoreHelper;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 
 import java.util.ArrayList;
 
-public class SwipeRecyclerViewActivity extends AppCompatActivity {
+/**
+ * @author wl
+ * @since 2018/05/23 15:23
+ */
+public class SmartRefreshRecyclerViewActivity extends AppCompatActivity {
     private ArrayList<String> datas;
     private LoadMoreHelper loadViewHelper;
     private SRecyclerAdapter adapter;
-    private SwipeRefreshLayout swipeRefreshLayout;
+    private SmartRefreshLayout smartRefreshLayout;
     private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_swipe_recycler_view);
+        setContentView(R.layout.activity_smart_refresh_layout_recycler_view);
         getSupportActionBar().setTitle("RecyclerView sample");
 
         init();
-        getDatas(true);
         loadViewHelper.setRefresh();
     }
 
     private void init() {
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.srl);
+        smartRefreshLayout = (SmartRefreshLayout) findViewById(R.id.srl);
         recyclerView = (RecyclerView) findViewById(R.id.rv);
         datas = new ArrayList<>();
         adapter = new SRecyclerAdapter(datas);
-        swipeRefreshLayout.setProgressViewOffset(false, 40, 140);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, recyclerView);
+        loadViewHelper = new LoadMoreHelper(smartRefreshLayout, new SmartRefreshLayoutHandler(), recyclerView);
         loadViewHelper.setAdapter(adapter);
         loadViewHelper.setOnRefreshLoadListener(new LoadMoreHelper.OnRefreshLoadListener() {
             @Override
@@ -122,4 +125,5 @@ public class SwipeRecyclerViewActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
         return hasMore;
     }
+
 }

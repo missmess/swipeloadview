@@ -1,1 +1,1 @@
-include ':sample', ':swipeloadview'
+include ':sample', ':loadmorehelper'
