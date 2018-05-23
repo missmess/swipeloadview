@@ -94,7 +94,7 @@ bintray {
     configurations = ['archives']
     pkg {
         repo = "maven"
-        name = "swipeloadview"                // project name in jcenter
+        name = "LoadMoreHelper"                // project name in jcenter
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]
