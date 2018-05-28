@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.missmess.demo.R;
-import com.missmess.swipeloadview.recyclerview.HFAdapter;
 
 import java.util.List;
 
@@ -14,7 +13,7 @@ import java.util.List;
  * @author wl
  * @since 2016/07/08 15:48
  */
-public class SRecyclerAdapter extends HFAdapter {
+public class SRecyclerAdapter extends RecyclerView.Adapter {
     private List<String> datas;
 
     public SRecyclerAdapter(List<String> datas) {
@@ -22,20 +21,20 @@ public class SRecyclerAdapter extends HFAdapter {
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolderHF(ViewGroup viewGroup, int type) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int type) {
         View view = View.inflate(viewGroup.getContext(), R.layout.item_text, null);
         view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolderHF(RecyclerView.ViewHolder vh, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder vh, int position) {
         ViewHolder holder = (ViewHolder) vh;
         holder.tv.setText(String.format("%s %d", datas.get(position), position));
     }
 
     @Override
-    public int getItemCountHF() {
+    public int getItemCount() {
         return datas.size();
     }
 

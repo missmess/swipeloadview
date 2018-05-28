@@ -6,6 +6,7 @@ import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.Toast;
 
 import com.missmess.demo.adapter.SRecyclerAdapter;
 import com.missmess.demo.utils.HttpUtils;
@@ -37,9 +38,10 @@ public class NoneRecyclerViewActivity extends AppCompatActivity {
         datas = new ArrayList<>();
         adapter = new SRecyclerAdapter(datas);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+        Toast.makeText(this, "拉一下加载数据", Toast.LENGTH_SHORT).show();
 
         loadViewHelper = new LoadMoreHelper(recyclerView);
-        loadViewHelper.setAdapter(adapter);
         loadViewHelper.setOnRefreshLoadListener(new LoadMoreHelper.SimpleOnLoadListener() {
             @Override
             public void onLoad() {

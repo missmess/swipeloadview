@@ -40,10 +40,10 @@ public class SwipeListViewActivity extends AppCompatActivity {
 
         datas = new ArrayList<>();
         adapter = new SListAdapter(datas);
+        listView.setAdapter(adapter);
         swipeRefreshLayout.setProgressViewOffset(false, 40, 140);
 
         loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, listView);
-        loadViewHelper.setAdapter(adapter);
         loadViewHelper.setOnRefreshLoadListener(new LoadMoreHelper.OnRefreshLoadListener() {
             @Override
             public void onRefresh() {

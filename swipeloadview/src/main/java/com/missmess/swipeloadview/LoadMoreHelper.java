@@ -29,9 +29,6 @@ public class LoadMoreHelper {
     private ILoadMoreView mLoadMoreView;
     private ILoadViewHandler loadHandler;
     private OnRefreshLoadListener onRefreshLoadListener;
-    private OnScrollBottomListener onScrollBottomListener;
-    private View.OnClickListener onLoadMoreBtnClickListener;
-    private boolean hasInitLoadMoreView = false;
     private boolean mHasMore = true;
     private boolean hasError = false;
     private boolean isLoading = false;
@@ -65,23 +62,15 @@ public class LoadMoreHelper {
      * @param loadMoreView 定义加载更多的各种状态变更和显示策略
      * @param <K> 刷新控件view group
      * @param <V> 内容控件view
-     * @param <A> 内容控件adapter
      */
-    public <K extends View, V extends View, A> LoadMoreHelper(K refreshLayout, IRefreshLayoutHandler<K> refreshLayoutHandler, V refreshView, ILoadViewHandler<V, A> loadViewHandler, ILoadMoreView loadMoreView) {
+    public <K extends View, V extends View, A> LoadMoreHelper(K refreshLayout, IRefreshLayoutHandler<K> refreshLayoutHandler, final V refreshView, ILoadViewHandler<V> loadViewHandler, ILoadMoreView loadMoreView) {
         this.mRefreshLayout = refreshLayout;
         this.mRefreshView = refreshView;
         if (loadMoreView == null) {
             loadMoreView = new DefaultLoadMoreView();
         }
         this.mLoadMoreView = loadMoreView;
-
-        IRefreshLayoutHandler rh = refreshLayoutHandler;
-        if (rh == null) {
-            if (refreshLayout instanceof SwipeRefreshLayout) {
-                rh = new SwipeRefreshLayoutHandler();
-            }
-        }
-
+        // load view handler
         if (refreshView == null) {
             throw new NullPointerException("RefreshView cannot be null");
         }
@@ -102,8 +91,8 @@ public class LoadMoreHelper {
                 throw new IllegalArgumentException("this view do not support Load-More function");
             }
         }
-
-        onScrollBottomListener = new OnScrollBottomListener() {
+        // 设置监听
+        OnScrollBottomListener onScrollBottomListener = new OnScrollBottomListener() {
             @Override
             public void onScrollBottom() {
                 if (!hasError) {
@@ -111,12 +100,14 @@ public class LoadMoreHelper {
                 }
             }
         };
-        onLoadMoreBtnClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                judgeToLoadMore();
+        loadHandler.handleSetListener(mRefreshView, onScrollBottomListener);
+        // refresh layout handler
+        IRefreshLayoutHandler rh = refreshLayoutHandler;
+        if (rh == null) {
+            if (refreshLayout instanceof SwipeRefreshLayout) {
+                rh = new SwipeRefreshLayoutHandler();
             }
-        };
+        }
         if (rh != null && mRefreshLayout != null) {
             refreshHandler = rh;
             rh.handleSetRefreshListener(refreshLayout, new Runnable() {
@@ -133,14 +124,30 @@ public class LoadMoreHelper {
                 }
             });
         }
+        // 设置footer
+        createAndSetLoadMoreFooter();
     }
 
     public ILoadViewHandler getLoadHandler() {
         return loadHandler;
     }
 
+    private void createAndSetLoadMoreFooter() {
+        View loadmoreView = mLoadMoreView.create(LayoutInflater.from(mRefreshView.getContext()), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                judgeToLoadMore();
+            }
+        });
+        loadHandler.handleAddFooter(mRefreshView, loadmoreView);
+    }
+
+    private boolean isLoadMoreInitialed() {
+        return loadHandler.isLoadViewPrepared();
+    }
+
     private void judgeToLoadMore() {
-        if (mHasMore && !isRefreshing() && !isLoading()) { //有数据，并且不在刷新,加载中
+        if (isLoadMoreInitialed() && mHasMore && !isRefreshing() && !isLoading()) { //有数据，并且不在刷新,加载中
             hasError = false;
             isLoading = true;
             mLoadMoreView.showLoading();
@@ -159,17 +166,6 @@ public class LoadMoreHelper {
     }
 
     /**
-     * 设置适配器。需要与设置的refreshView匹配。
-     *
-     * @param adapter 适配器
-     */
-    public void setAdapter(Object adapter) {
-        loadHandler.handleSetListener(mRefreshView, onScrollBottomListener);
-        View loadmoreView = mLoadMoreView.create(LayoutInflater.from(mRefreshView.getContext()), onLoadMoreBtnClickListener);
-        hasInitLoadMoreView = loadHandler.handleSetAdapter(mRefreshView, adapter, loadmoreView);
-    }
-
-    /**
      * 显示刷新动画。（仅显示动画）
      */
     public void setRefresh() {
@@ -184,7 +180,7 @@ public class LoadMoreHelper {
      */
     public void setHasMoreData(boolean hasMoreData) {
         this.mHasMore = hasMoreData;
-        if (hasInitLoadMoreView && mLoadMoreView != null) {
+        if (isLoadMoreInitialed() && mLoadMoreView != null) {
             if (hasMoreData) {
                 mLoadMoreView.showNormal();
             } else {
@@ -207,7 +203,7 @@ public class LoadMoreHelper {
      */
     public void completeLoadMore() {
         isLoading = false;
-        if (mHasMore && !hasError) //没错误，并且有更多数据
+        if (isLoadMoreInitialed() & mHasMore && !hasError) //没错误，并且有更多数据
             mLoadMoreView.showNormal();
     }
 
@@ -235,8 +231,10 @@ public class LoadMoreHelper {
      * @param msg 错误信息
      */
     public void setLoadMoreError(CharSequence msg) {
-        hasError = true;
-        mLoadMoreView.showFail(msg);
+        if (isLoadMoreInitialed()) {
+            hasError = true;
+            mLoadMoreView.showFail(msg);
+        }
     }
 
     public static abstract class SimpleOnLoadListener implements OnRefreshLoadListener {

@@ -12,7 +12,7 @@ public class HFRecyclerAdapter extends HFAdapter {
 	public HFRecyclerAdapter(Adapter adapter) {
 		super();
 		this.adapter = adapter;
-        registerAdapterDataObserver(adapterDataObserver);
+		adapter.registerAdapterDataObserver(adapterDataObserver);
     }
 
     private RecyclerView.AdapterDataObserver adapterDataObserver = new RecyclerView.AdapterDataObserver() {

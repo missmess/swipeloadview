@@ -1,5 +1,6 @@
 package com.missmess.swipeloadview.gridview;
 
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -18,27 +19,35 @@ import in.srain.cube.views.GridViewWithHeaderAndFooter;
  * @author wl
  * @since 2016/4/6 19:13
  */
-public class GridViewHandler implements ILoadViewHandler<GridViewWithHeaderAndFooter, ListAdapter> {
+public class GridViewHandler implements ILoadViewHandler<GridViewWithHeaderAndFooter> {
     private OnScrollListener scrollListener;
     private OnItemSelectedListener itemSelectedListener;
+    private boolean isPrepared;
 
     @Override
-    public boolean handleSetAdapter(GridViewWithHeaderAndFooter refreshView, ListAdapter adapter, View loadMoreView) {
-        boolean hasInit = false;
-		if (loadMoreView != null) {
-            refreshView.addFooterView(loadMoreView);
-
-			hasInit = true;
-		}
-		refreshView.setAdapter(adapter);
-		return hasInit;
-	}
+    public void handleAddFooter(GridViewWithHeaderAndFooter refreshView, @NonNull View loadMoreFooter) {
+        ListAdapter adapter = refreshView.getAdapter();
+        // GridViewWithHeaderAndFooter规定了必须在添加footer和header之后setAdapter
+        if (adapter != null) {
+            refreshView.setAdapter(null);
+        }
+        refreshView.addFooterView(loadMoreFooter);
+        if (adapter != null) {
+            refreshView.setAdapter(adapter);
+        }
+        isPrepared = true;
+    }
 
     @Override
     public void handleSetListener(GridViewWithHeaderAndFooter refreshView, LoadMoreHelper.OnScrollBottomListener onScrollBottomListener) {
         refreshView.setOnScrollListener(new ListViewOnScrollListener(onScrollBottomListener));
 		refreshView.setOnItemSelectedListener(new ListViewOnItemSelectedListener(onScrollBottomListener));
 	}
+
+    @Override
+    public boolean isLoadViewPrepared() {
+        return isPrepared;
+    }
 
     public void setOnScrollListener(OnScrollListener scrollListener) {
         this.scrollListener = scrollListener;

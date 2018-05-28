@@ -1,5 +1,6 @@
 package com.missmess.swipeloadview;
 
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.missmess.swipeloadview.LoadMoreHelper.OnScrollBottomListener;
@@ -10,17 +11,14 @@ import com.missmess.swipeloadview.LoadMoreHelper.OnScrollBottomListener;
  * @author wl
  * @since 2016/07/11 16:09
  * @param <V> refreshView的类型，如ListView
- * @param <A> refreshView的adapter，如ListAdapter
  */
-public interface ILoadViewHandler<V extends View, A> {
+public interface ILoadViewHandler<V extends View> {
     /**
-     * 定义如何去创建foot，并添加到refreshView上。并设置adapter
+     * 定义如何把加载更多的foot view，添加到refreshView上。
      * @param refreshView 如ListView
-     * @param adapter 如ListAdapter
-     * @param loadMoreView 加载更多的view
-     * @return 是否处理成功
+     * @param loadMoreFooter 加载更多的footer view
      */
-    boolean handleSetAdapter(V refreshView, A adapter, View loadMoreView);
+    void handleAddFooter(V refreshView, @NonNull View loadMoreFooter);
 
     /**
      * 该方法实现为refreshView添加监听，必须要有OnScrollBottomListener
@@ -28,4 +26,10 @@ public interface ILoadViewHandler<V extends View, A> {
      * @param onScrollBottomListener 滑到底部时的监听。
      */
     void handleSetListener(V refreshView, OnScrollBottomListener onScrollBottomListener);
+
+    /**
+     * 加载更多的footer view是否已经成功设置完成。
+     * @return true - 指示已经成功设置了。
+     */
+    boolean isLoadViewPrepared();
 }

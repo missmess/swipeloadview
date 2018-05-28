@@ -1,11 +1,10 @@
 package com.missmess.swipeloadview.listview;
 
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
-import android.widget.ListView;
 
 import com.missmess.swipeloadview.ILoadViewHandler;
 import com.missmess.swipeloadview.LoadMoreHelper;
@@ -14,31 +13,26 @@ import com.missmess.swipeloadview.LoadMoreHelper;
  * @author wl
  * @since 2016/07/11 17:51
  */
-public class ExpandableListViewHandler implements ILoadViewHandler<ExpandableListView, ExpandableListAdapter> {
+public class ExpandableListViewHandler implements ILoadViewHandler<ExpandableListView> {
     private AbsListView.OnScrollListener scrollListener;
     private AdapterView.OnItemSelectedListener itemSelectedListener;
+    private boolean isPrepared;
 
     @Override
-    public boolean handleSetAdapter(ExpandableListView refreshView, ExpandableListAdapter adapter, View loadMoreView) {
-        boolean hasInit = initFooter(refreshView, loadMoreView);
-        refreshView.setAdapter(adapter);
-        return hasInit;
-    }
-
-    private boolean initFooter(ListView listView, View loadMoreView) {
-        boolean hasInit = false;
-        if (loadMoreView != null) {
-            listView.addFooterView(loadMoreView);
-
-            hasInit = true;
-        }
-        return hasInit;
+    public void handleAddFooter(ExpandableListView refreshView, @NonNull View loadMoreFooter) {
+        refreshView.addFooterView(loadMoreFooter);
+        isPrepared = true;
     }
 
     @Override
     public void handleSetListener(ExpandableListView refreshView, LoadMoreHelper.OnScrollBottomListener onScrollBottomListener) {
         refreshView.setOnScrollListener(new ListViewOnScrollListener(onScrollBottomListener));
         refreshView.setOnItemSelectedListener(new ListViewOnItemSelectedListener(onScrollBottomListener));
+    }
+
+    @Override
+    public boolean isLoadViewPrepared() {
+        return isPrepared;
     }
 
     public void setOnScrollListener(AbsListView.OnScrollListener scrollListener) {

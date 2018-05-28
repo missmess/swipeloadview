@@ -42,9 +42,9 @@ public class SmartRefreshRecyclerViewActivity extends AppCompatActivity {
         datas = new ArrayList<>();
         adapter = new SRecyclerAdapter(datas);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
 
         loadViewHelper = new LoadMoreHelper(smartRefreshLayout, new SmartRefreshLayoutHandler(), recyclerView);
-        loadViewHelper.setAdapter(adapter);
         loadViewHelper.setOnRefreshLoadListener(new LoadMoreHelper.OnRefreshLoadListener() {
             @Override
             public void onRefresh() {

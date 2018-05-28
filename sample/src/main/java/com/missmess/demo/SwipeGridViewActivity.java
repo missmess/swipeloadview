@@ -37,10 +37,10 @@ public class SwipeGridViewActivity extends AppCompatActivity {
         gridView = (GridViewWithHeaderAndFooter) findViewById(R.id.gv);
         datas = new ArrayList<>();
         adapter = new SListAdapter(datas);
+        gridView.setAdapter(adapter);
         swipeRefreshLayout.setProgressViewOffset(false, 40, 140);
 
         loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, gridView);
-        loadViewHelper.setAdapter(adapter);
         loadViewHelper.setOnRefreshLoadListener(new LoadMoreHelper.OnRefreshLoadListener() {
             @Override
             public void onRefresh() {

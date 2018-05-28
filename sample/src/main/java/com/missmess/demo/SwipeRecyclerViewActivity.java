@@ -39,9 +39,9 @@ public class SwipeRecyclerViewActivity extends AppCompatActivity {
         adapter = new SRecyclerAdapter(datas);
         swipeRefreshLayout.setProgressViewOffset(false, 40, 140);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
 
         loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, recyclerView);
-        loadViewHelper.setAdapter(adapter);
         loadViewHelper.setOnRefreshLoadListener(new LoadMoreHelper.OnRefreshLoadListener() {
             @Override
             public void onRefresh() {

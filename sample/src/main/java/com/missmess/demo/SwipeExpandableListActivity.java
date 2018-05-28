@@ -36,10 +36,10 @@ public class SwipeExpandableListActivity extends AppCompatActivity {
         expandableListView = (ExpandableListView) findViewById(R.id.elv);
         datas = new ArrayList<>();
         adapter = new SExpandableAdapter(datas);
+        expandableListView.setAdapter(adapter);
         swipeRefreshLayout.setProgressViewOffset(false, 40, 140);
 
         loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, expandableListView);
-        loadViewHelper.setAdapter(adapter);
         loadViewHelper.setOnRefreshLoadListener(new LoadMoreHelper.OnRefreshLoadListener() {
             @Override
             public void onRefresh() {

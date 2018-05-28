@@ -16,9 +16,9 @@
 
 ### 主要功能介绍
 
-* 可以同时支持为ListView、RecyclerView、GridView、ExpandableListView等内容组件增加pull load功能。
-* load more包含上拉加载、加载中、加载失败、没有更多的功能。可以实现完全自定义。
-* 支持添加各种下拉刷新组件的关联，关联后可以解决refresh和load状态的一些处理和冲突等。
+* 默认支持为ListView、RecyclerView、GridView、ExpandableListView等内容组件增加pull load功能，其它控件可自行实现接口来添加支持。
+* load more包含上拉加载、加载中、加载失败、没有更多的功能。可以实现接口来完全自定义您想要的布局。
+* 理论上支持添加任意下拉刷新库的关联，关联后可以解决refresh和load状态的一些处理和冲突等。
 * 默认实现了一套完整的功能，包含SwipeRefreshLayout+(ListView, RecyclerView, GridView, ExpandableListView)+DefaultLoadMoreView。
 * 其它想要自定义的话，实现IRefreshLayoutHandler或ILoadViewHandler或ILoadMoreView（看你自己想自定义那些部分），并在构造LoadMoreHelper时传入即可。
 
@@ -29,9 +29,9 @@
 本library已经支持maven。Android Studio用户，只需要在项目的build.gradle中添加该depandencies：
 
   `
-    compile 'com.missmess.swipeloadview:loadmorehelper:2.1.0'
+    compile 'com.missmess.swipeloadview:loadmorehelper:2.1.1'
   `
-
+  <b>从2.1.1版本开始，去除了LoadMoreHelper.setAdapter方法，使用时只需要自己去调用各个setAdapter方法即可。使用起来更方便了。</b>
 ---
 
 ### 如何使用
@@ -42,8 +42,6 @@
 ```java
 // new a LoadMoreHelper
 LoadMoreHelper loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, listView);
-// set adapter
-loadViewHelper.setAdapter(adapter);
 // set refresh and load listener
 loadViewHelper.setOnRefreshLoadListener(new SwipeLoadViewHelper.OnRefreshLoadListener() {
     @Override
@@ -57,11 +55,11 @@ loadViewHelper.setOnRefreshLoadListener(new SwipeLoadViewHelper.OnRefreshLoadLis
     }
 });
 ```
-但是不要忘记在你的刷新或加载更多操作结束后，通知SwipeLoadViewHelper。
+但是不要忘记在你的刷新或加载更多操作结束后，通知LoadMoreHelper。
 ```java
-    // refresh OP finished，notify SwipeLoadViewHelper
+    // refresh OP finished，notify LoadMoreHelper
     loadViewHelper.completeRefresh();
-    // load more OP finished，notify SwipeLoadViewHelper
+    // load more OP finished，notify LoadMoreHelper
     loadViewHelper.completeLoadmore();
 ```
 ---
@@ -103,13 +101,11 @@ LoadMoreHelper loadViewHelper = new LoadMoreHelper(smartRefreshLayout, new IRefr
 * ListView
 ```java
 LoadMoreHelper loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, listView);
-loadViewHelper.setAdapter(new MyListAdapter());
 ```
 
 * RecyclerView
 ```java
 LoadMoreHelper loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, recyclerView);
-loadViewHelper.setAdapter(new MyRecyclerAdapter());
 ```
 
 * GridView
@@ -117,18 +113,16 @@ loadViewHelper.setAdapter(new MyRecyclerAdapter());
     需要使用`GridViewWithHeaderAndFooter`替代GridView。
 ```java
 LoadMoreHelper loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, gridView);
-loadViewHelper.setAdapter(new MyGridAdapter());
 ```
 
 * ExpandableListView
 ```java
 LoadMoreHelper loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, expandableListView);
-loadViewHelper.setAdapter(new MyExpandListAdapter());
 ```
 
-###### 2、通知SwipeLoadViewHelper，没有更多数据了
+###### 2、通知LoadMoreHelper，没有更多数据了
 
-  没有更多数据时，需要调用setHasMoreData方法告知SwipeLoadViewHelper。
+  没有更多数据时，需要调用setHasMoreData方法告知LoadMoreHelper。
 ```java
 if (nomoredata) { //没有更多数据了
     loadViewHelper.setHasMoreData(false);
@@ -196,7 +190,7 @@ public class MyLoadFactory implements ILoadViewFactory {
     }
 }
 ```
-并在new SwipeLoadViewHelper时，传参：
+并在new LoadMoreHelper时，传参：
 ```java
     LoadMoreHelper loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, listView, new MyLoadFactory());
 ```

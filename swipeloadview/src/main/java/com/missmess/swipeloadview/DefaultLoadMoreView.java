@@ -46,7 +46,7 @@ public class DefaultLoadMoreView implements ILoadMoreView {
         ProgressDrawable progressDrawable = new ProgressDrawable();
         progressDrawable.setColor(0xFF888888);
         progress_wheel.setImageDrawable(progressDrawable);
-        showNormal();
+        progress_wheel.setVisibility(View.GONE);
 
         return footView;
     }

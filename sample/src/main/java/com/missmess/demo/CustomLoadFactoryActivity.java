@@ -38,10 +38,10 @@ public class CustomLoadFactoryActivity extends AppCompatActivity {
 
         listView.addHeaderView(headView);
         SCustomAdapter adapter = new SCustomAdapter();
+        listView.setAdapter(adapter);
         swipeRefreshLayout.setProgressViewOffset(false, 40, 140);
 
         loadViewHelper = new LoadMoreHelper(swipeRefreshLayout, listView, new MyLoadMoreView());
-        loadViewHelper.setAdapter(adapter);
         loadViewHelper.setOnRefreshLoadListener(new LoadMoreHelper.OnRefreshLoadListener() {
             @Override
             public void onRefresh() {
